@@ -1,6 +1,7 @@
 import pygame
 import random
 import os
+from network import Network
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -14,24 +15,25 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, hide_or_seek):
+    def __init__(self, role, starting_position):
         pygame.sprite.Sprite.__init__(self)
-        if hide_or_seek == 'H':
+        if role == 'H':
             self.img = pygame.image.load(os.path.join(img_folder, 'p1_jump.png')).convert()
             self.img_m = pygame.image.load(os.path.join(img_folder, 'p1_jump_m.png')).convert()
             self.image = self.img
 
             self.image.set_colorkey(BLACK)
             self.rect = self.img.get_rect()
-            self.rect.center = (1830, 90)
-        elif hide_or_seek == 'S':
+            self.rect.center = starting_position
+        elif role == 'S':
             self.img = pygame.image.load(os.path.join(img_folder, 'seek.png')).convert()
             self.img_m = pygame.image.load(os.path.join(img_folder, 'seek_m.png')).convert()
 
             self.image = self.img
             self.image.set_colorkey(BLACK)
             self.rect = self.image.get_rect()
-            self.rect.center = (90, 990)
+            self.rect.center = starting_position
+
         self.looking_dir = 1
 
     def update(self):
@@ -107,39 +109,48 @@ class Player(pygame.sprite.Sprite):
 
 
 # Создаем игру и окно
-pygame.init()
-pygame.mixer.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("nedopackman")
-clock = pygame.time.Clock()
-all_sprites = pygame.sprite.Group()
 
-game_folder = os.path.dirname(__file__)
-img_folder = os.path.join(game_folder, 'img')
+def read_pos(str_):
+    str_ = str_.split(',')
+    return int(str_[0]), int(str_[1])
 
-# Цикл игры
-running = True
-hide = Player('H')
-seek = Player('S')
+def make_pos(tup):
+    return str(tup[0]) + ',' + str(tup[1])
 
-all_sprites.add(seek)
-all_sprites.add(hide)
-while running:
-    # Держим цикл на правильной скорости
-    clock.tick(FPS)
-    # Ввод процесса (события)
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
-            running = False
 
-    # Обновление
-    all_sprites.update()
+if __name__ == '__main__':
+    pygame.init()
+    pygame.mixer.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("nedopackman")
+    clock = pygame.time.Clock()
+    all_sprites = pygame.sprite.Group()
 
-    # Рендеринг
-    screen.fill(BLACK)
-    all_sprites.draw(screen)
-    # После отрисовки всего, переворачиваем экран
-    pygame.display.flip()
+    game_folder = os.path.dirname(__file__)
+    img_folder = os.path.join(game_folder, 'img')
 
-pygame.quit()
+    running = True
+
+    network = Network()
+    start_pos = read_pos(network.getPos())
+    player = Player('H', start_pos)
+
+    all_sprites.add(player)
+
+    while running:
+        # Держим цикл на правильной скорости
+        clock.tick(FPS)
+        # Ввод процесса (события)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+
+        all_sprites.update()
+
+        screen.fill(BLACK)
+        all_sprites.draw(screen)
+
+        pygame.display.flip()
+
+    pygame.quit()
