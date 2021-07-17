@@ -6,13 +6,13 @@ class Network:
         self.server = '95.73.147.89'
         self.port = 5000
         self.addr = (self.server, self.port)
-        self.pos = self.connect_suka()
+        self.pos = self.connect()
         print(self.pos)
 
     def getPos(self):
         return self.pos
 
-    def connect_suka(self):
+    def connect(self):
         try:
             self.client.connect(self.addr)
             return self.client.recv(2048).decode()
