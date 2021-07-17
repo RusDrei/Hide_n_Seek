@@ -2,17 +2,17 @@ import socket
 
 class Network:
     def __init__(self):
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = '192.168.0.162'
-        self.port = 9000
+        self.client = socket.socket()
+        self.server = '95.73.147.89'
+        self.port = 5000
         self.addr = (self.server, self.port)
-        self.pos = self.connect()
+        self.pos = self.connect_suka()
         print(self.pos)
 
     def getPos(self):
         return self.pos
 
-    def connect(self):
+    def connect_suka(self):
         try:
             self.client.connect(self.addr)
             return self.client.recv(2048).decode()
