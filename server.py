@@ -2,26 +2,13 @@ import socket
 from _thread import *
 import sys
 
-server = '192.168.0.162'         # local address         to get go to command prompt and type 'ipconfig'
-port = 9000
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-try:
-    s.bind((server, port))
-except socket.error as error:
-    str(error)
-
-
-s.listen(2)     # 2 players
-print('Waiting for connection')
 
 def threaded_client(conn):
     conn.send(str.encode('Connected'))
 
     while True:
         try:
-            data = conn.recv(2048)
+            data = conn.recv(1024)
             reply = data.decode('utf-8')
 
             if not data:
@@ -39,7 +26,21 @@ def threaded_client(conn):
     conn.close()
 
 
+server = ''         # local address         to get go to command prompt and type 'ipconfig'
+port = 5000
+
+s = socket.socket()
+
+try:
+    s.bind((server, port))
+except socket.error as error:
+    str(error)
+
+s.listen(5)     # 5 players
+print('Waiting for connection')
+
 while True:
+    print('*')
     connection, addr = s.accept()
     print('Connected to: ', addr)
 
